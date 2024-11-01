@@ -60,7 +60,7 @@
            IsHitTestVisible="False"
            Visibility="Visible"/>
 
-        <Button Content="Войти" Width="228" Height="42" FontFamily="Calibri" FontSize="24" Margin="87,265,85,63">
+        <Button Content="Войти" Width="228" Height="42" FontFamily="Calibri" FontSize="24" Margin="87,265,85,63" Click="Button_Click">
             <Button.Style>
                 <Style TargetType="Button">
                     <Setter Property="BorderThickness" Value="0"/>

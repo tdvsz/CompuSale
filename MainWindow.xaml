@@ -5,8 +5,88 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CompuSale"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="CompuSale" Height="900" Width="1600">
+
+    <Window.Resources>
+        <!-- Стиль для TreeView, убирающий обводку -->
+        <Style TargetType="TreeView">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TreeView">
+                        <Border Name="Border" Background="Transparent" BorderThickness="0">
+                            <ScrollViewer Background="Transparent" Focusable="False"
+                                          CanContentScroll="False"
+                                          BorderThickness="0">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TreeViewItem}">
+            <Setter Property="IsExpanded" Value="True"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True" >
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                   Color="#CCCCCC"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                                   Color="Yellow"/>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
+
+    <Grid Width="1600" Height="900">
+        <Border BorderBrush="#E6E6E6" BorderThickness="2" CornerRadius="10" Margin="20,20,1320,756" RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Border.RenderTransform>
+        </Border>
+        <Grid Margin="20,164,1305,120">
+            <TreeView x:Name="listTreeView" FontFamily="Calibri" FontSize="24">
+                <TreeViewItem Padding="5" Header="Товар">
+                    <TreeViewItem Padding="5" Header="Производитель"/>
+                    <TreeViewItem Padding="5" Header="Категория" />
+                </TreeViewItem>
+                <TreeViewItem Padding="5" Header="Клиент">
+                    <TreeViewItem Padding="5" Header="Тип клиента"/>
+                </TreeViewItem>
+                <TreeViewItem Padding="5" Header="Продажа">
+                    <TreeViewItem Padding="5" Header="Способ доставки"/>
+                </TreeViewItem>
+                <TreeViewItem Padding="5" Header="Сотрудники"/>
+            </TreeView>
+        </Grid>
+        <Border BorderBrush="#E6E6E6" BorderThickness="2" CornerRadius="10" Margin="301,20,39,54">
+            <Button Margin="30,30,1100,759">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            CornerRadius="4">
+                                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Border>
     </Grid>
 </Window>

@@ -5,8 +5,156 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CompuSale"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="CompuSale" Height="900" Width="1600">
+
+    <Window.Resources>
+        <!-- Стиль для TreeView, убирающий обводку -->
+        <Style TargetType="TreeView">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TreeView">
+                        <Border Name="Border" Background="Transparent" BorderThickness="0">
+                            <ScrollViewer Background="Transparent" Focusable="False"
+                                          CanContentScroll="False"
+                                          BorderThickness="0">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TreeViewItem}">
+            <!-- <Setter Property="IsExpanded" Value="True"/> -->
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True" >
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                   Color="#CCCCCC"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                                   Color="#CCCCCC"/>
+            </Style.Resources>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="#E6E6E6"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#FFF3F3F3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFE2E2E2"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#F1F1F1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Width="1600" Height="900" Background="White">
+        <Border Background="#FFF3F3F3" BorderBrush="#E6E6E6" BorderThickness="0" CornerRadius="10" Margin="20,20,1320,756" RenderTransformOrigin="0.5,0.5">
+            <Grid>
+                <TextBlock Text="Приветствуем," FontFamily="Calibri" FontSize="24" Margin="53,10,53,80"></TextBlock>
+                <TextBlock x:Name="UserNameTextBlock" TextWrapping="Wrap" TextAlignment="Center" FontFamily="Calibri" FontSize="24" Margin="0,37,0,16" HorizontalAlignment="Center" Width="236"></TextBlock>
+            </Grid>
+        </Border>
+        <Grid Margin="20,164,1305,120">
+            <TreeView x:Name="listTreeView" FontFamily="Calibri" FontSize="24" SelectedItemChanged="TreeView_SelectedItemChanged">
+                <TreeViewItem x:Name="productTreeViewItem" Padding="5" Header="Товар">
+                    <TreeViewItem x:Name="manufacturerTreeViewItem" Padding="5" Header="Производитель"/>
+                    <TreeViewItem x:Name="categoryTreeViewItem" Padding="5" Header="Категория" />
+                </TreeViewItem>
+                <TreeViewItem x:Name="clientsTreeViewItem" Padding="5" Header="Клиент">
+                    <TreeViewItem x:Name="clientTypeTreeViewItem" Padding="5" Header="Тип клиента"/>
+                </TreeViewItem>
+                <TreeViewItem x:Name="saleTreeViewItem" Padding="5" Header="Продажа">
+                    <TreeViewItem x:Name="deliveryTypeTreeViewItem" Padding="5" Header="Способ доставки"/>
+                </TreeViewItem>
+                <TreeViewItem x:Name="employeesTreeViewItem" Padding="5" Header="Сотрудники"/>
+            </TreeView>
+        </Grid>
+        <Border Background="#FFF3F3F3" BorderBrush="#E6E6E6" BorderThickness="0" CornerRadius="10" Margin="301,20,39,54">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,20,0,0">
+                    <Button x:Name="AddButton" Margin="15, 0" Click="AddButton_Click" Width="54" Height="54">
+                        <Button.Content>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="40" Width="48" VerticalAlignment="Center">
+                                <Image Width="38" Height="38" Source="/add2.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <ToolTip Background="white" Foreground="Black" FontSize="14">
+                                Добавить
+                            </ToolTip>
+                        </Button.ToolTip>
+                    </Button>
+                    <Button x:Name="EditButton" Margin="15, 0" Width="54" Height="54">
+                        <Button.Content>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
+                                <Image Width="38" Height="38" Source="/edit2.png"/>
+                            </StackPanel>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <ToolTip Background="white" Foreground="Black" FontSize="14">
+                                Изменить
+                            </ToolTip>
+                        </Button.ToolTip>
+                    </Button>
+                    <Button x:Name="SaveButton" Margin="15, 0" Width="54" Height="54">
+                        <Button.Content>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
+                                <Image Width="38" Height="38" Source="/save2.png"/>
+                            </StackPanel>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <ToolTip Background="white" Foreground="Black" FontSize="14">
+                                Сохранить
+                            </ToolTip>
+                        </Button.ToolTip>
+                    </Button>
+                    <Button x:Name="DeleteButton" Margin="15, 0" Width="54" Height="54">
+                        <Button.Content>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
+                                <Image Width="38" Height="38" Source="/delete2.png"/>
+                            </StackPanel>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <ToolTip Background="white" Foreground="Black" FontSize="14">
+                                Удалить
+                            </ToolTip>
+                        </Button.ToolTip>
+                    </Button>
+                    <Button x:Name="SortButton" Margin="15, 0" Width="54" Height="54">
+                        <Button.Content>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
+                                <Image Width="38" Height="38" Source="/sort3.png"/>
+                            </StackPanel>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <ToolTip Background="white" Foreground="Black" FontSize="14">
+                                Сорировать
+                            </ToolTip>
+                        </Button.ToolTip>
+                    </Button>
+                </StackPanel>
+                <DataGrid x:Name="EmployeeDataGrid" AutoGenerateColumns="True" Margin="24,93,32,27"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

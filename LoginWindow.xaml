@@ -42,7 +42,7 @@
                    Foreground="Gray"
                    FontFamily="Calibri"
                    FontSize="24"
-                   Margin="58,123,279,0"
+                   Margin="60,123,277,0"
                    VerticalAlignment="Top"
                    IsHitTestVisible="False"
                    Visibility="Visible"/>
@@ -55,7 +55,7 @@
            Foreground="Gray"
            FontFamily="Calibri"
            FontSize="24"
-           Margin="58,194,261,0"
+           Margin="60,194,259,0"
            VerticalAlignment="Top"
            IsHitTestVisible="False"
            Visibility="Visible"/>

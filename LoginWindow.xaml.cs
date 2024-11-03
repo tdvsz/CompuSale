@@ -14,30 +14,30 @@ namespace CompuSale
 
         private string _password = "";
         private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
-        
-        private bool AuthenticateUser(string username, string password)
+
+        private string AuthenticateUser(string username, string password)
         {
-            bool isAuthenticated = false;
-            
+            string fullName = null;
+
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
 
-                    // Запрос на проверку логина и пароля в таблице Сотрудник
-                    string query = "SELECT COUNT(*) FROM Сотрудник WHERE Логин = @username AND Пароль = @password";
+                    string query = "SELECT ФИО FROM Сотрудник WHERE Логин = @username AND Пароль = @password";
 
                     using (OleDbCommand command = new OleDbCommand(query, connection))
                     {
-                        // Параметры для защиты от SQL-инъекций
                         command.Parameters.AddWithValue("@username", username);
                         command.Parameters.AddWithValue("@password", password);
 
-                        int result = (int)command.ExecuteScalar();
+                        object result = command.ExecuteScalar();
 
-                        // Если результат больше 0, пользователь найден
-                        isAuthenticated = result > 0;
+                        if (result != null)
+                        {
+                            fullName = result.ToString();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -46,16 +46,14 @@ namespace CompuSale
                 }
             }
 
-            return isAuthenticated;
+            return fullName;
         }
+
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // позиция курсора до изменения
             int caretPosition = passwordTextBox.CaretIndex;
-
-            // новый ввод пользователя
             string newText = passwordTextBox.Text;
-            
+
             if (newText.Length > _password.Length)
             {
                 string addedText = newText.Substring(_password.Length);
@@ -65,12 +63,10 @@ namespace CompuSale
             {
                 _password = _password.Substring(0, newText.Length);
             }
-            
+
             passwordTextBox.Text = new string('*', _password.Length);
-            
             passwordTextBox.CaretIndex = caretPosition;
-            
-            
+
             if (sender == loginTextBox)
             {
                 loginWatermark.Visibility = string.IsNullOrEmpty(loginTextBox.Text) ? Visibility.Visible : Visibility.Hidden;
@@ -86,11 +82,14 @@ namespace CompuSale
             string username = loginTextBox.Text;
             string password = _password;
 
-            if (AuthenticateUser(username, password))
+            string fullName = AuthenticateUser(username, password);
+
+            if (fullName != null)
             {
                 MainWindow mainWindow = new MainWindow();
+                mainWindow.UserFullName = fullName;
                 mainWindow.Show();
-                
+
                 this.Close();
             }
             else

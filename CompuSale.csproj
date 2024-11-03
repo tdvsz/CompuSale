@@ -114,6 +114,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="t.webp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -129,6 +130,39 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="sort.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="sort2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="sort3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="delete2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="save2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="edit2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="add2.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

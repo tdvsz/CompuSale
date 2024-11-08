@@ -33,10 +33,16 @@ namespace CompuSale
         }
 
         private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
+        private int selectedProductId = -1;
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-
+            TreeViewItem selectedItem = listTreeView.SelectedItem as TreeViewItem;
+            if (selectedItem == productTreeViewItem)
+            {
+                ProductWindow newWindow = new ProductWindow();
+                newWindow.Show();
+            }
         }
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -92,6 +98,18 @@ namespace CompuSale
             }
         }
 
+        
+
+        private void EmployeeDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (EmployeeDataGrid.SelectedItem is DataRowView row)
+            {
+                selectedProductId = Convert.ToInt32(row["ID_товара"]);
+            }
+        }
+
+
+
         private void LoadProducts()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -99,11 +117,12 @@ namespace CompuSale
                 try
                 {
                     connection.Open();
-                    string query = "SELECT \n\tТовар.Название,\n\tПроизводитель.Название AS Производитель_товара,\n\tКатегория.Название AS Категория_товара,\n\tТовар.Цена,\n\tТовар.Количество_на_складе,\n\tТовар.Описание\nFROM \n\tТовар\nINNER JOIN \n\tПроизводитель ON Товар.ID_производителя = Производитель.ID_производителя\nINNER JOIN \n\tКатегория ON Товар.ID_категории = Категория.ID_категории";
+                    string query = "SELECT Товар.ID_товара,\n    Товар.Название,\n    Производитель.Название AS Производитель_товара,\n   \n    Товар.Цена,\n    Товар.Количество_на_складе,\n    Товар.Описание\nFROM \n    Товар\nINNER JOIN \n    Производитель ON Товар.ID_производителя = Производитель.ID_производителя\n\n";
                     OleDbDataAdapter adapter = new OleDbDataAdapter(query, connection);
                     DataTable dataTable = new DataTable();
                     adapter.Fill(dataTable);
                     EmployeeDataGrid.ItemsSource = dataTable.DefaultView;
+                    EmployeeDataGrid.Columns[0].Visibility = Visibility.Collapsed;
                 }
                 catch (Exception ex)
                 {
@@ -243,6 +262,23 @@ namespace CompuSale
                 {
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
+            }
+        }
+
+        private void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem selectedItem = listTreeView.SelectedItem as TreeViewItem;
+            if (selectedItem == productTreeViewItem)
+            {
+                if (selectedProductId == -1)
+                {
+                    MessageBox.Show("Выберите товар для редактирования.");
+                    return;
+                }
+
+                ProductWindow productWindow = new ProductWindow();
+                productWindow.LoadProductDataById(selectedProductId);
+                productWindow.ShowDialog();
             }
         }
     }

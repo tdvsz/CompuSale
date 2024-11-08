@@ -104,7 +104,7 @@
                             </ToolTip>
                         </Button.ToolTip>
                     </Button>
-                    <Button x:Name="EditButton" Margin="15, 0" Width="54" Height="54">
+                    <Button x:Name="EditButton" Margin="15, 0" Width="54" Height="54" Click="EditButton_Click">
                         <Button.Content>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
                                 <Image Width="38" Height="38" Source="/edit2.png"/>
@@ -153,7 +153,7 @@
                         </Button.ToolTip>
                     </Button>
                 </StackPanel>
-                <DataGrid x:Name="EmployeeDataGrid" AutoGenerateColumns="True" Margin="24,93,32,27"/>
+                <DataGrid x:Name="EmployeeDataGrid" AutoGenerateColumns="True" Margin="24,93,32,27" SelectionChanged="EmployeeDataGrid_SelectionChanged"/>
             </Grid>
         </Border>
     </Grid>

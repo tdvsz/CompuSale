@@ -43,7 +43,6 @@ namespace CompuSale
 
         private void LoadCategorySuggestions()
         {
-            string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
             string query = "SELECT Название FROM Категория";
 
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -263,14 +262,12 @@ namespace CompuSale
             string query;
             if (isEditMode)
             {
-                // Команда UPDATE для редактирования существующего товара
                 query = "UPDATE Товар SET Название = @Название, Описание = @Описание, Цена = @Цена, " +
                         "Количество_на_складе = @Количество_на_складе, ID_категории = @ID_категории, " +
                         "ID_производителя = @ID_производителя WHERE ID_товара = @ID_товара";
             }
             else
             {
-                // Команда INSERT для добавления нового товара
                 query = "INSERT INTO Товар (Название, Описание, Цена, Количество_на_складе, ID_категории, ID_производителя) " +
                         "VALUES (@Название, @Описание, @Цена, @Количество_на_складе, @ID_категории, @ID_производителя)";
             }
@@ -288,7 +285,6 @@ namespace CompuSale
 
                 if (isEditMode)
                 {
-                    // Добавляем ID для условия WHERE в UPDATE
                     command.Parameters.Add("@ID_товара", OleDbType.Integer).Value = currentProductId;
                 }
 
@@ -303,7 +299,6 @@ namespace CompuSale
                     MessageBox.Show("Ошибка при сохранении данных: " + ex.Message);
                 }
             }
-
             this.Close();
         }
 
@@ -407,6 +402,5 @@ namespace CompuSale
                 return result != null ? result.ToString() : string.Empty;
             }
         }
-
     }
 }

@@ -128,7 +128,7 @@
                             </ToolTip>
                         </Button.ToolTip>
                     </Button>
-                    <Button x:Name="DeleteButton" Margin="15, 0" Width="54" Height="54">
+                    <Button x:Name="DeleteButton" Click="DeleteButton_Click" Margin="15, 0" Width="54" Height="54">
                         <Button.Content>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
                                 <Image Width="38" Height="38" Source="/delete2.png"/>

@@ -7,6 +7,9 @@ namespace CompuSale
 {
     public partial class LoginWindow : Window
     {
+        public static int CurrentEmployeeID { get; set; }  // ID авторизованного сотрудника
+        public static string CurrentEmployeeName { get; set; }  // ФИО авторизованного сотрудника
+
         public LoginWindow()
         {
             InitializeComponent();
@@ -15,9 +18,9 @@ namespace CompuSale
         private string _password = "";
         private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
 
-        private string AuthenticateUser(string username, string password)
+        private int? AuthenticateUser(string username, string password)
         {
-            string fullName = null;
+            int? employeeId = null;
 
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
@@ -25,18 +28,20 @@ namespace CompuSale
                 {
                     connection.Open();
 
-                    string query = "SELECT ФИО FROM Сотрудник WHERE Логин = @username AND Пароль = @password";
+                    string query = "SELECT ID_сотрудника, ФИО FROM Сотрудник WHERE Логин = @username AND Пароль = @password";
 
                     using (OleDbCommand command = new OleDbCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@username", username);
                         command.Parameters.AddWithValue("@password", password);
 
-                        object result = command.ExecuteScalar();
-
-                        if (result != null)
+                        using (OleDbDataReader reader = command.ExecuteReader())
                         {
-                            fullName = result.ToString();
+                            if (reader.Read())
+                            {
+                                employeeId = reader.GetInt32(0);  // Получаем ID сотрудника
+                                CurrentEmployeeName = reader.GetString(1);  // Сохраняем ФИО
+                            }
                         }
                     }
                 }
@@ -46,7 +51,31 @@ namespace CompuSale
                 }
             }
 
-            return fullName;
+            return employeeId;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string username = loginTextBox.Text;
+            string password = _password;
+
+            int? employeeId = AuthenticateUser(username, password);
+
+            if (employeeId.HasValue)
+            {
+                CurrentEmployeeID = employeeId.Value;  // Сохраняем ID авторизованного сотрудника
+
+                MainWindow mainWindow = new MainWindow();
+                mainWindow.EmployeeName = CurrentEmployeeName;  // Передаем ФИО на главную форму
+                mainWindow.EmployeeID = CurrentEmployeeID;
+                mainWindow.Show();
+
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Неверный логин или пароль.");
+            }
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -74,27 +103,6 @@ namespace CompuSale
             else if (sender == passwordTextBox)
             {
                 passwordWatermark.Visibility = string.IsNullOrEmpty(passwordTextBox.Text) ? Visibility.Visible : Visibility.Hidden;
-            }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            string username = loginTextBox.Text;
-            string password = _password;
-
-            string fullName = AuthenticateUser(username, password);
-
-            if (fullName != null)
-            {
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.UserFullName = fullName;
-                mainWindow.Show();
-
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("Неверный логин или пароль.");
             }
         }
     }

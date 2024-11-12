@@ -30,7 +30,6 @@ namespace CompuSale
         {
             InitializeComponent();
         }
-
         
         public void LoadManufacturerDataById(int ManufacturerId)
         {

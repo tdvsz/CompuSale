@@ -17,15 +17,23 @@ using System.Windows.Shapes;
 
 namespace CompuSale
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        public string UserFullName
+        public string EmployeeName
         {
             get { return UserNameTextBlock.Text; }
             set { UserNameTextBlock.Text = value; }
+        }
+
+        public int employeeID;
+        public int EmployeeID
+        {
+            get {return employeeID;}
+            set 
+            { 
+                Console.WriteLine("EmployeeID 1 step: " + value);
+                employeeID = value; 
+            }
         }
 
         public MainWindow()
@@ -33,12 +41,12 @@ namespace CompuSale
             InitializeComponent();
         }
 
-        private string connectionString =
-            @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
+        private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
 
         private int selectedProductId = -1;
         private int selectedManufacturerId = -1;
         private int selectedCategoryId = -1;
+        private int selectedSaleId = -1;
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
@@ -51,6 +59,10 @@ namespace CompuSale
             if (selectedItem == saleTreeViewItem)
             {
                 SaleWindow newWindow = new SaleWindow();
+                Console.WriteLine("Employee 2 step: " + EmployeeID);
+                newWindow.EmployeeID = EmployeeID;
+                newWindow.EmployeeName = EmployeeName;
+                Console.WriteLine("Employee ID 3 step: " + EmployeeID);
                 newWindow.Show();
             }
             if (selectedItem == manufacturerTreeViewItem)
@@ -70,7 +82,6 @@ namespace CompuSale
                 newWindow.Show();
             }
         }
-
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue is TreeViewItem selectedItem)
@@ -123,9 +134,6 @@ namespace CompuSale
                 // }
             }
         }
-
-
-
         private void EmployeeDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (EmployeeDataGrid.SelectedItem is DataRowView row)
@@ -144,6 +152,10 @@ namespace CompuSale
                 {
                     selectedCategoryId = Convert.ToInt32(row["ID_категории"]);
                 }
+                if (row.Row.Table.Columns.Contains("ID_продажи"))
+                {
+                    selectedSaleId = Convert.ToInt32(row["ID_продажи"]);
+                }
             }
         }
         
@@ -155,7 +167,7 @@ namespace CompuSale
                 {
                     connection.Open();
                     string query =
-                        "SELECT Товар.ID_товара,\n    Товар.Название,\n    Производитель.Название AS Производитель_товара,\n   \n    Товар.Цена,\n    Товар.Количество_на_складе,\n    Товар.Описание\nFROM \n    Товар\nINNER JOIN \n    Производитель ON Товар.ID_производителя = Производитель.ID_производителя\n\n";
+                        "SELECT \nТовар.ID_товара,    Товар.Название,\nПроизводитель.Название AS Название_производителя,\n    Категория.Название AS Название_категории,    Товар.Цена,\n    Товар.Количество_на_складе,\n    Товар.Описание FROM \n    (Товар\n    INNER JOIN Производитель ON Товар.ID_производителя = Производитель.ID_производителя)\n    INNER JOIN Категория ON Товар.ID_категории = Категория.ID_категории;\n";
                     OleDbDataAdapter adapter = new OleDbDataAdapter(query, connection);
                     DataTable dataTable = new DataTable();
                     adapter.Fill(dataTable);
@@ -168,7 +180,6 @@ namespace CompuSale
                 }
             }
         }
-
         private void LoadManufacturers()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -189,7 +200,6 @@ namespace CompuSale
                 }
             }
         }
-
         private void LoadClients()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -210,7 +220,6 @@ namespace CompuSale
                 }
             }
         }
-
         private void LoadCategories()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -231,7 +240,6 @@ namespace CompuSale
                 }
             }
         }
-
         private void LoadClientTypes()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -251,7 +259,6 @@ namespace CompuSale
                 }
             }
         }
-
         private void LoadSales()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -264,6 +271,7 @@ namespace CompuSale
                     DataTable dataTable = new DataTable();
                     adapter.Fill(dataTable);
                     EmployeeDataGrid.ItemsSource = dataTable.DefaultView;
+                    EmployeeDataGrid.Columns[0].Visibility = Visibility.Collapsed;
                 }
                 catch (Exception ex)
                 {
@@ -271,7 +279,6 @@ namespace CompuSale
                 }
             }
         }
-
         private void LoadDeliveryTypes()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -291,7 +298,6 @@ namespace CompuSale
                 }
             }
         }
-
         private void LoadEmployees()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -311,7 +317,7 @@ namespace CompuSale
                 }
             }
         }
-
+        
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             TreeViewItem selectedItem = listTreeView.SelectedItem as TreeViewItem;
@@ -327,7 +333,18 @@ namespace CompuSale
                 productWindow.LoadProductDataById(selectedProductId);
                 productWindow.ShowDialog();
             }
-
+            if (selectedItem == saleTreeViewItem)
+            {
+                if (selectedSaleId == -1)
+                {
+                    MessageBox.Show("Выберите продажу для редактирования.");
+                    return;
+                }
+                
+                SaleWindow saleWindow = new SaleWindow();
+                saleWindow.LoadSaleById(selectedSaleId);
+                saleWindow.ShowDialog();
+            }
             if (selectedItem == manufacturerTreeViewItem)
             {
                 if (selectedManufacturerId == -1)
@@ -343,7 +360,6 @@ namespace CompuSale
                 listsWindow.LoadManufacturerDataById(selectedManufacturerId);
                 listsWindow.ShowDialog();
             }
-            
             if (selectedItem == categoryTreeViewItem)
             {
                 if (selectedCategoryId == -1)
@@ -360,7 +376,7 @@ namespace CompuSale
                 listsWindow.ShowDialog();
             }
         }
-
+        
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             if (EmployeeDataGrid.SelectedItem is DataRowView row)
@@ -382,7 +398,6 @@ namespace CompuSale
                     id = Convert.ToInt32(row["ID_категории"]);
                     DeleteRecordById("Категория", "ID_категории", id);
                 }
-                
                 if (id != -1)
                 {
                     row.Delete();
@@ -397,6 +412,7 @@ namespace CompuSale
                 MessageBox.Show("Выберите строку для удаления.");
             }
         }
+        
         private void DeleteRecordById(string tableName, string idColumn, int id)
         {
             string query = $"DELETE FROM {tableName} WHERE {idColumn} = @ID";

@@ -188,5 +188,8 @@
   <ItemGroup>
     <Resource Include="cancel.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="search.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

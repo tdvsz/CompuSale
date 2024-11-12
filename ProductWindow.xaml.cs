@@ -302,8 +302,6 @@ namespace CompuSale
             this.Close();
         }
 
-
-
         private int GetCategoryId(string categoryName)
         {
             string query = "SELECT ID_категории FROM Категория WHERE Название = @Название";
@@ -345,6 +343,7 @@ namespace CompuSale
                 }
             }
         }
+        
         public void LoadProductDataById(int productId)
         {
             string query = "SELECT Название, Описание, Цена, Количество_на_складе, ID_категории, ID_производителя FROM Товар WHERE ID_товара = @ID_товара";

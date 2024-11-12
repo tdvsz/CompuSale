@@ -44,6 +44,7 @@ namespace CompuSale
         private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
 
         private int selectedProductId = -1;
+        private int selectedClientId = -1;
         private int selectedManufacturerId = -1;
         private int selectedCategoryId = -1;
         private int selectedSaleId = -1;
@@ -54,6 +55,11 @@ namespace CompuSale
             if (selectedItem == productTreeViewItem)
             {
                 ProductWindow newWindow = new ProductWindow();
+                newWindow.Show();
+            }
+            if (selectedItem == clientsTreeViewItem)
+            {
+                ClientWindow newWindow = new ClientWindow();
                 newWindow.Show();
             }
             if (selectedItem == saleTreeViewItem)
@@ -152,9 +158,15 @@ namespace CompuSale
                 {
                     selectedCategoryId = Convert.ToInt32(row["ID_категории"]);
                 }
+                
                 if (row.Row.Table.Columns.Contains("ID_продажи"))
                 {
                     selectedSaleId = Convert.ToInt32(row["ID_продажи"]);
+                }
+                
+                if (row.Row.Table.Columns.Contains("ID_клиента"))
+                {
+                    selectedClientId = Convert.ToInt32(row["ID_клиента"]);
                 }
             }
         }
@@ -213,6 +225,7 @@ namespace CompuSale
                     DataTable dataTable = new DataTable();
                     adapter.Fill(dataTable);
                     EmployeeDataGrid.ItemsSource = dataTable.DefaultView;
+                    EmployeeDataGrid.Columns[0].Visibility = Visibility.Collapsed;
                 }
                 catch (Exception ex)
                 {
@@ -332,6 +345,18 @@ namespace CompuSale
                 ProductWindow productWindow = new ProductWindow();
                 productWindow.LoadProductDataById(selectedProductId);
                 productWindow.ShowDialog();
+            }
+            if (selectedItem == clientsTreeViewItem)
+            {
+                if (selectedClientId == -1)
+                {
+                    MessageBox.Show("Выберите клиента для редактирования.");
+                    return;
+                }
+
+                ClientWindow clientWindow = new ClientWindow();
+                clientWindow.LoadClientDataById(selectedClientId);
+                clientWindow.ShowDialog();
             }
             if (selectedItem == saleTreeViewItem)
             {

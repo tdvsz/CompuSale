@@ -279,7 +279,7 @@ namespace CompuSale
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Продажа";
+                    string query = "SELECT Продажа.ID_продажи,\nПродажа.Дата_продажи,\nСотрудник.ФИО AS Сотрудник,\nПродажа.Статус,\nПродажа.Общая_стоимость,\nКлиент.Название AS Клиент,\nСпособ_доставки.Название AS Способ_доставки,\nПродажа.Адрес_доставки\nFROM ((Продажа\nINNER JOIN Сотрудник ON Продажа.ID_сотрудника = Сотрудник.ID_сотрудника)\nINNER JOIN Клиент ON Продажа.ID_клиента = Клиент.ID_клиента)\nINNER JOIN Способ_доставки ON Продажа.ID_способа_доставки = Способ_доставки.ID_способа_доставки";
                     OleDbDataAdapter adapter = new OleDbDataAdapter(query, connection);
                     DataTable dataTable = new DataTable();
                     adapter.Fill(dataTable);

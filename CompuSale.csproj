@@ -142,7 +142,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Resource Include="t.webp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

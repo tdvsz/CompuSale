@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace CompuSale
 {
@@ -26,14 +28,137 @@ namespace CompuSale
             get { return employeeNameTextBox.Text; }
             set { employeeNameTextBox.Text = value; }
         }
+        
         private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
-        private int currentSaleId = -1; // ID текущей продажи, должен задаваться при создании новой продажи
+        private List<string> clientSuggestions = new List<string>();
+        private int currentSaleId = -1;
+        private int currentClientId = -1;// ID текущей продажи, должен задаваться при создании новой продажи
         private bool isEditMode = false;
 
         public SaleWindow()
         {
             InitializeComponent();
-            debug.Text = EmployeeID.ToString();
+            LoadClientSuggestions();
+        }
+        
+        private void LoadClientSuggestions()
+        {
+            string query = "SELECT Название FROM Клиент";
+
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                OleDbCommand command = new OleDbCommand(query, connection);
+                connection.Open();
+                OleDbDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    clientSuggestions.Add(reader["Название"].ToString());
+                }
+            }
+        }
+        
+        private void ClientTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            clientWatermark.Visibility = string.IsNullOrEmpty(clientTextBox.Text) ? Visibility.Visible : Visibility.Hidden;
+
+            string input = clientTextBox.Text.ToLower();
+            if (string.IsNullOrEmpty(input))
+            {
+                clientSuggestionsListBox.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var filteredSuggestions = clientSuggestions.FindAll(s => s.ToLower().Contains(input));
+            clientSuggestionsListBox.ItemsSource = filteredSuggestions;
+            clientSuggestionsListBox.Visibility = filteredSuggestions.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+        
+        private void ClientSuggestionsListBox_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (clientSuggestionsListBox.SelectedItem != null)
+            {
+                clientTextBox.Text = clientSuggestionsListBox.SelectedItem.ToString();
+                clientSuggestionsListBox.Visibility = Visibility.Collapsed;
+                // suggestionsListBox.SelectedItem = null;
+            }
+        }
+        
+        private void EnterPress(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Keyboard.ClearFocus();
+                e.Handled = true;
+            }
+        }
+        
+        private void clientTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                clientSuggestionsListBox.Visibility = Visibility.Collapsed;
+
+                clientTextBox.Clear();
+                clientTextBox.Focus();
+            }
+        }
+        
+        private int GetClientId(string clientName)
+        {
+            string query = "SELECT ID_клиента FROM Клиент WHERE Название = @Название";
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                OleDbCommand command = new OleDbCommand(query, connection);
+                command.Parameters.AddWithValue("@Название", clientName);
+
+                try
+                {
+                    connection.Open();
+                    object result = command.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : -1;
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+        
+        private string GetClientNameById(int clientId)
+        {
+            string query = "SELECT Название FROM Клиент WHERE ID_клиента = @ID_клиента";
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                OleDbCommand command = new OleDbCommand(query, connection);
+                command.Parameters.AddWithValue("@ID_клиента", clientId);
+
+                connection.Open();
+                object result = command.ExecuteScalar();
+                return result != null ? result.ToString() : string.Empty;
+            }
+        }
+        
+        public void LoadClientDataById(int clientId)
+        {
+            string query = "SELECT Название FROM Клиент WHERE ID_клиента = @ID_клиента";
+
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                OleDbCommand command = new OleDbCommand(query, connection);
+                command.Parameters.AddWithValue("@ID_клиента", clientId);
+
+                connection.Open();
+                OleDbDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    clientTextBox.Text = reader["Название"].ToString();
+
+                    // Установите флаг редактирования
+                    isEditMode = true;
+                    currentClientId = clientId;
+                }
+            }
         }
 
         // Класс для хранения данных о товаре в DataGrid
@@ -209,6 +334,12 @@ namespace CompuSale
 
         private void SaveBtn_Click(object sender, RoutedEventArgs e)
         {
+            // Получаем имя клиента из TextBox
+            string clientName = clientTextBox.Text.Trim();
+
+            // Проверяем, существует ли клиент
+            currentClientId = GetClientId(clientName);
+            
             // SQL-запрос для добавления новой продажи в базу данных
             string query = "INSERT INTO Продажа (Дата_продажи, Статус, Общая_стоимость, адрес_доставки, ID_сотрудника, ID_клиента, ID_способа_доставки) " +
                            "VALUES (@Дата_продажи, @Статус, @Общая_стоимость, @адрес_доставки, @ID_сотрудника, @ID_клиента, @ID_способа_доставки)";
@@ -223,7 +354,7 @@ namespace CompuSale
                 command.Parameters.AddWithValue("@Общая_стоимость", 0);          // Начальная общая стоимость
                 command.Parameters.AddWithValue("@адрес_доставки", "Минск, улица Примерная, 123"); // Примерный адрес доставки
                 command.Parameters.AddWithValue("@ID_сотрудника", EmployeeID);
-                command.Parameters.AddWithValue("@ID_клиента", 3);               // Примерный ID клиента
+                command.Parameters.AddWithValue("@ID_клиента", currentClientId);               // Примерный ID клиента
                 command.Parameters.AddWithValue("@ID_способа_доставки", 1);      // Примерный способ доставки
 
                 try

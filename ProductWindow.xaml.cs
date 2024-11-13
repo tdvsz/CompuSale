@@ -147,7 +147,7 @@ namespace CompuSale
 
         private bool IsTextAllowed(string currentText, string newText)
         {
-            Regex regex = new Regex("^[0-9,]+$");
+            Regex regex = new Regex("^[0-9]+$");
 
             if (!regex.IsMatch(newText))
                 return false;

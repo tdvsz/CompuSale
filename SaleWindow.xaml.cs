@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -296,23 +298,7 @@ namespace CompuSale
         
         private void CountTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (selectedProductsDataGrid.SelectedItem is DataRowView selectedItem)
-            {
-                // Получаем ID товара и новое количество из TextBox
-                int productId = Convert.ToInt32(selectedItem["ID_товара"]);
-                int newQuantity;
-
-                // Проверяем, является ли введенное значение числом
-                if (int.TryParse(CountTextBox.Text, out newQuantity) && newQuantity > 0)
-                {
-                    // Обновляем количество товара
-                    UpdateProductQuantityInSalesItem(productId, newQuantity);
-                }
-                else
-                {
-                    MessageBox.Show("Введите корректное количество.");
-                }
-            }
+            CountWatermark.Visibility = string.IsNullOrEmpty(CountTextBox.Text) ? Visibility.Visible : Visibility.Hidden;
         }
         
         private void UpdateProductQuantityInSalesItem(int productId, int newQuantity)
@@ -330,7 +316,7 @@ namespace CompuSale
                 {
                     connection.Open();
                     command.ExecuteNonQuery();
-                    ReloadDataGrid();  // Перезагружаем DataGrid после обновления
+                    ReloadDataGrid();
                 }
                 catch (Exception ex)
                 {
@@ -408,9 +394,36 @@ namespace CompuSale
         private void UpdateTotalPrice()
         {
             decimal totalPrice = CalculateTotalPrice();
-            totalPriceTextBox.Text = totalPrice.ToString("C"); // Отображаем в TextBox с форматированием валюты
-        }
+            totalPriceTextBox.Text = $"{totalPrice.ToString()} BYN";
+            
+            // Проверяем, установлен ли текущий ID продажи
+            if (currentSaleId <= 0)
+            {
+                MessageBox.Show("Не удалось сохранить общую стоимость. Неверный ID продажи.");
+                return;
+            }
 
+            string query = "UPDATE Продажа SET Общая_стоимость = @Общая_стоимость WHERE ID_продажи = @ID_продажи";
+
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                OleDbCommand command = new OleDbCommand(query, connection);
+
+                // Добавляем параметры для SQL-запроса
+                command.Parameters.AddWithValue("@Общая_стоимость", totalPrice);
+                command.Parameters.AddWithValue("@ID_продажи", currentSaleId);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при сохранении общей стоимости: " + ex.Message);
+                }
+            }
+        }
         
         private void SearchBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -420,7 +433,33 @@ namespace CompuSale
                 SearchProducts(searchText);
             }
         }
-
+        
+        private void SaveCountBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedProductsDataGrid.SelectedItem is DataRowView selectedRow)
+            {
+                // Получаем ID_товара из выделенной строки
+                int productId = Convert.ToInt32(selectedRow["ID_товара"]);
+        
+                // Получаем новое количество из TextBox
+                if (int.TryParse(CountTextBox.Text, out int newQuantity))
+                {
+                    // Обновляем количество в базе данных
+                    UpdateProductQuantityInSalesItem(productId, newQuantity);
+                    
+                    ReloadDataGrid();
+                }
+                else
+                {
+                    MessageBox.Show("Введите корректное количество.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите товар для обновления.");
+            }
+        }
+        
         private void SaveBtn_Click(object sender, RoutedEventArgs e)
         {
             // Получаем имя клиента из TextBox
@@ -429,7 +468,7 @@ namespace CompuSale
             // Проверяем, существует ли клиент
             currentClientId = GetClientId(clientName);
             
-            string selectedStatus = StatusComboBox.SelectedItem?.ToString() ?? "Ожидание"; // По умолчанию "Ожидание" если не выбрано
+            string selectedStatus = (StatusComboBox.SelectedItem as ComboBoxItem).Content.ToString();
             
             // SQL-запрос для добавления новой продажи в базу данных
             string query = "INSERT INTO Продажа (Дата_продажи, Статус, Общая_стоимость, адрес_доставки, ID_сотрудника, ID_клиента, ID_способа_доставки) " +
@@ -442,7 +481,7 @@ namespace CompuSale
                 // Устанавливаем параметры для SQL-запроса
                 command.Parameters.AddWithValue("@Дата_продажи", DateTime.Now.ToString("dd.MM.yyyy"));  // Текущая дата
                 command.Parameters.AddWithValue("@Статус", selectedStatus);
-                command.Parameters.AddWithValue("@Общая_стоимость", CalculateTotalPrice());          // Начальная общая стоимость
+                command.Parameters.AddWithValue("@Общая_стоимость", 0);          // Начальная общая стоимость
                 command.Parameters.AddWithValue("@адрес_доставки", "Минск, улица Примерная, 123"); // Примерный адрес доставки
                 command.Parameters.AddWithValue("@ID_сотрудника", EmployeeID);
                 command.Parameters.AddWithValue("@ID_клиента", currentClientId);               // Примерный ID клиента
@@ -465,30 +504,3 @@ namespace CompuSale
         }
     }
 }
-
-// private void UpdateQuantityButton_Click(object sender, RoutedEventArgs e)
-// {
-//     if (selectedProductsDataGrid.SelectedItem is DataRowView selectedRow)
-//     {
-//         // Получаем ID_товара из выделенной строки
-//         int productId = Convert.ToInt32(selectedRow["ID_товара"]);
-//         
-//         // Получаем новое количество из TextBox
-//         if (int.TryParse(CountTextBox.Text, out int newQuantity))
-//         {
-//             // Обновляем количество в базе данных
-//             UpdateProductQuantity(currentSaleId, productId, newQuantity);
-//             
-//             // Перезагружаем DataGrid для отображения обновленных данных
-//             ReloadDataGrid();
-//         }
-//         else
-//         {
-//             MessageBox.Show("Введите корректное количество.");
-//         }
-//     }
-//     else
-//     {
-//         MessageBox.Show("Выберите товар для обновления.");
-//     }
-// }

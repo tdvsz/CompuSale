@@ -423,6 +423,11 @@ namespace CompuSale
                     id = Convert.ToInt32(row["ID_категории"]);
                     DeleteRecordById("Категория", "ID_категории", id);
                 }
+                else if (row.Row.Table.Columns.Contains("ID_продажи"))
+                {
+                    id = Convert.ToInt32(row["ID_продажи"]);
+                    DeleteRecordById("Продажа", "ID_продажи", id);
+                }
                 if (id != -1)
                 {
                     row.Delete();

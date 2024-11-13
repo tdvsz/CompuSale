@@ -31,7 +31,7 @@
     </Window.Resources>
 
     <Grid Height="514" Width="1018">
-        <ComboBox Margin="0,126,718,362">
+        <ComboBox x:Name="StatusComboBox" Margin="0,126,718,362">
             <ComboBoxItem Content="Создана"/>
             <ComboBoxItem Content="Подтверждена "/>
             <ComboBoxItem Content="Оплачена"/>
@@ -54,7 +54,21 @@
                 IsHitTestVisible="False"
                 Visibility="Visible" Margin="40,7,-22,0"/>
         </Grid>
-        <TextBlock x:Name="employeeNameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" Width="200" FontFamily="Calibri"/>
+        <Grid Margin="-29,100,400,100">
+            <StackPanel>
+                <TextBox x:Name="CountTextBox" MaxLength="20" Width="300" Height="36" TextChanged="CountTextBox_TextChanged" KeyDown="EnterPress" Style="{StaticResource RoundedTextBoxStyle}" FontSize="18" />
+            </StackPanel>
+            <TextBlock x:Name="CountWatermark"
+                       Text="Количество"
+                       Foreground="Gray"
+                       FontFamily="Calibri"
+                       FontSize="18"
+                       VerticalAlignment="Top"
+                       IsHitTestVisible="False"
+                       Visibility="Visible" Margin="40,7,-22,0"/>
+        </Grid>
+        <TextBlock x:Name="employeeNameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 200" Width="200" FontFamily="Calibri"/>
+        <TextBlock x:Name="totalPriceTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" Width="200" FontFamily="Calibri"/>
         <TextBox x:Name="searchTextBox" MaxLength="50" Width="300" Height="36" TextChanged="searchTextBox_TextChanged" Style="{StaticResource RoundedTextBoxStyle}" FontSize="18" Margin="670,0,48,478"/>
         <TextBlock x:Name="searchWatermark"
             Text="Товар"

@@ -152,7 +152,31 @@
                             </ToolTip>
                         </Button.ToolTip>
                     </Button>
+                    <Button x:Name="ReportButton" Margin="15, 0" Width="54" Height="54">
+                        <Button.Content>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
+                                <Image Width="38" Height="38" Source="/report.png"/>
+                            </StackPanel>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <ToolTip Background="white" Foreground="Black" FontSize="14">
+                                Создать отчет
+                            </ToolTip>
+                        </Button.ToolTip>
+                    </Button>
                 </StackPanel>
+                <Button x:Name="LogoutButton" Click="LogoutButton_Click" Margin="-271,772,1477,0" Width="54" Height="54">
+                    <Button.Content>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
+                            <Image Width="38" Height="38" Source="/logout.png"/>
+                        </StackPanel>
+                    </Button.Content>
+                    <Button.ToolTip>
+                        <ToolTip Background="white" Foreground="Black" FontSize="14">
+                            Выйти
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
                 <DataGrid x:Name="EmployeeDataGrid" AutoGenerateColumns="True" Margin="24,93,32,27" SelectionChanged="EmployeeDataGrid_SelectionChanged"/>
             </Grid>
         </Border>

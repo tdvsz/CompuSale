@@ -68,7 +68,7 @@
         </Grid>
         <Grid Margin="454,172,392,28">
             <StackPanel>
-                <TextBox x:Name="CountTextBox" MaxLength="20" Width="172" Height="36" TextChanged="CountTextBox_TextChanged" KeyDown="EnterPress" Style="{StaticResource RoundedTextBoxStyle}" FontSize="18" />
+                <TextBox x:Name="CountTextBox" MaxLength="8" Width="172" Height="36" TextChanged="CountTextBox_TextChanged" KeyDown="EnterPress" Style="{StaticResource RoundedTextBoxStyle}" FontSize="18" />
             </StackPanel>
             <TextBlock x:Name="CountWatermark"
                        Text="Количество"

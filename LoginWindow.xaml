@@ -36,6 +36,7 @@
 
         <TextBox x:Name="loginTextBox"
                  Margin="50,114,50,208"
+                 MaxLength="8"
                  Style="{StaticResource RoundedTextBoxStyle}" TextChanged="TextBox_TextChanged" />
         <TextBlock x:Name="loginWatermark"
                    Text="Логин"
@@ -49,6 +50,7 @@
 
         <TextBox x:Name="passwordTextBox"
                  Margin="50,185,50,137"
+                 MaxLength="8"
                  Style="{StaticResource RoundedTextBoxStyle}" TextChanged="TextBox_TextChanged"/>
         <TextBlock x:Name="passwordWatermark"
            Text="Пароль"

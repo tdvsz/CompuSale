@@ -65,6 +65,7 @@ namespace CompuSale
                 Console.WriteLine("Сотрудник авторизован");
                 
                 employeesTreeViewItem.Visibility = Visibility.Collapsed;
+                ReportButton.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -566,6 +567,13 @@ namespace CompuSale
                     MessageBox.Show("Ошибка при удалении данных: " + ex.Message);
                 }
             }
+        }
+
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow loginwindow = new LoginWindow();
+            loginwindow.Show();
+            this.Close();
         }
     }
 }

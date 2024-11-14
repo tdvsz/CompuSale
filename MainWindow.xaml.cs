@@ -368,6 +368,7 @@ namespace CompuSale
                 
                 SaleWindow saleWindow = new SaleWindow();
                 saleWindow.LoadSaleById(selectedSaleId);
+                saleWindow.EditSale(selectedSaleId);
                 saleWindow.ShowDialog();
             }
             if (selectedItem == manufacturerTreeViewItem)

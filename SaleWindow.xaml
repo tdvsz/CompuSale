@@ -31,19 +31,31 @@
     </Window.Resources>
 
     <Grid Height="514" Width="1018">
-        <ComboBox x:Name="StatusComboBox" Margin="10,142,708,346">
-            <ComboBoxItem Content="Создана"/>
-            <ComboBoxItem Content="Подтверждена "/>
-            <ComboBoxItem Content="Оплачена"/>
-            <ComboBoxItem Content="Отправлена"/>
-            <ComboBoxItem Content="Доставлена"/>
-            <ComboBoxItem Content="Отменена"/>
+        <Grid Margin="10,240,836,-40">
+            <StackPanel Margin="0,0,-129,0">
+                <TextBox x:Name="AdressTextBox" Visibility="Collapsed" MaxLength="50" Width="300" Height="36" TextChanged="AdressTextBox_TextChanged" KeyDown="EnterPress" Style="{StaticResource RoundedTextBoxStyle}" FontSize="18" />
+            </StackPanel>
+            <TextBlock x:Name="AdressWatermark"
+               Text="Адрес"
+               Foreground="Gray"
+               FontFamily="Calibri"
+               FontSize="18"
+               VerticalAlignment="Top"
+               IsHitTestVisible="False"
+               Visibility="Collapsed" Margin="10,6,8,0"/>
+        </Grid>
+        <ComboBox x:Name="StatusComboBox" Margin="22,142,696,346">
+            <ComboBoxItem Content="Новый"/>
+            <ComboBoxItem Content="В процессе"/>
+            <ComboBoxItem Content="Завершен"/>
+            <ComboBoxItem Content="Отменен"/>
         </ComboBox>
-        <Grid Margin="-19,84,679,216">
-            <StackPanel>
+        <ComboBox x:Name="DeliveryComboBox" Margin="22,190,696,298" SelectionChanged="comboBoxDeliveryType_SelectionChanged"></ComboBox>
+        <Grid Margin="-7,84,667,288">
+            <StackPanel Margin="0,0,0,-121">
                 <TextBox x:Name="clientTextBox" MaxLength="20" Width="300" Height="36" TextChanged="ClientTextBox_TextChanged" KeyDown="EnterPress" Style="{StaticResource RoundedTextBoxStyle}" FontSize="18" PreviewKeyDown="clientTextBox_PreviewKeyDown"/>
                 <ListBox x:Name="clientSuggestionsListBox" Width="300" Height="100" VerticalAlignment="Top" Margin="0,5,0,0" 
-    Visibility="Collapsed" PreviewMouseLeftButtonUp="ClientSuggestionsListBox_MouseLeftButtonUp"/>
+                Visibility="Collapsed" PreviewMouseLeftButtonUp="ClientSuggestionsListBox_MouseLeftButtonUp"/>
             </StackPanel>
             <TextBlock x:Name="clientWatermark"
                 Text="Клиент"
@@ -67,8 +79,8 @@
                        IsHitTestVisible="False"
                        Visibility="Visible" Margin="10,6,8,0"/>
         </Grid>
-        <TextBlock x:Name="employeeNameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Width="509" FontFamily="Calibri" FontSize="24" Margin="10,0,0,0"/>
-        <TextBlock x:Name="totalPriceTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,470,0,0" Width="200" FontFamily="Calibri" FontSize="24"/>
+        <TextBlock x:Name="employeeNameTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Width="508" FontFamily="Calibri" FontSize="24" Margin="22,0,0,0"/>
+        <TextBlock x:Name="totalPriceTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="22,445,0,0" Width="658" FontFamily="Calibri" FontSize="48"/>
         <TextBox x:Name="searchTextBox" MaxLength="50" Width="300" Height="36" TextChanged="searchTextBox_TextChanged" Style="{StaticResource RoundedTextBoxStyle}" FontSize="18" Margin="452,0,266,478"/>
         <TextBlock x:Name="searchWatermark"
             Text="Товар"
@@ -197,6 +209,6 @@
         </Button>
         <ListBox Name="searchResultsListBox" SelectionChanged="SearchResultsListBox_SelectionChanged" Margin="452,47,218,362"/>
         <DataGrid Name="selectedProductsDataGrid" AutoGenerateColumns="True" Margin="454,231,169,87"></DataGrid>
-        <DatePicker Name="saleDatePicker" SelectedDateFormat="Short" Margin="10,47,887,443" />
+        <DatePicker Name="saleDatePicker" SelectedDateFormat="Short" Margin="22,47,875,443" />
     </Grid>
 </Window>

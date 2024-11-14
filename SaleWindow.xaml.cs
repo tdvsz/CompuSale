@@ -31,6 +31,17 @@ namespace CompuSale
             set { employeeNameTextBox.Text = value; }
         }
         
+        public class DeliveryMethod
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+
+            public override string ToString()
+            {
+                return Name; // Мы будем показывать только название в ComboBox
+            }
+        }
+        
         private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
         private List<string> clientSuggestions = new List<string>();
         private int currentSaleId = -1;
@@ -41,7 +52,48 @@ namespace CompuSale
         {
             InitializeComponent();
             LoadClientSuggestions();
+            LoadDataIntoComboBox();
         }
+        
+        private void LoadDataIntoComboBox()
+        {
+            string query = "SELECT ID_способа_доставки, Название FROM Способ_доставки";
+
+            DeliveryComboBox.Items.Clear();
+    
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                OleDbCommand command = new OleDbCommand(query, connection);
+
+                try
+                {
+                    connection.Open();
+            
+                    OleDbDataReader reader = command.ExecuteReader();
+
+                    // Чтение данных и добавление в ComboBox
+                    while (reader.Read())
+                    {
+                        int id = Convert.ToInt32(reader["ID_способа_доставки"]);
+                        string name = reader["Название"].ToString();
+
+                        // Создаем новый объект DeliveryMethod и добавляем в ComboBox
+                        DeliveryMethod deliveryMethod = new DeliveryMethod
+                        {
+                            ID = id,
+                            Name = name
+                        };
+
+                        DeliveryComboBox.Items.Add(deliveryMethod);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при загрузке данных: " + ex.Message);
+                }
+            }
+        }
+
         
         private void LoadClientSuggestions()
         {
@@ -324,38 +376,6 @@ namespace CompuSale
                 }
             }
         }
-
-        public void LoadSaleById(int saleId)
-        {
-            string query = "SELECT * FROM Элемент_продажи WHERE ID_продажи = @ID_продажи";
-
-            using (OleDbConnection connection = new OleDbConnection(connectionString))
-            {
-                OleDbCommand command = new OleDbCommand(query, connection);
-                command.Parameters.AddWithValue("@ID_продажи", saleId);
-
-                connection.Open();
-                OleDbDataReader reader = command.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    // Запрос для получения товаров, связанных с конкретной продажей
-                    query = "SELECT Элемент_продажи.ID_товара, Товар.Название, Элемент_продажи.Количество " +
-                            "FROM Элемент_продажи " +
-                            "INNER JOIN Товар ON Элемент_продажи.ID_товара = Товар.ID_товара " +
-                            "WHERE Элемент_продажи.ID_продажи = @ID_продажи"; // Фильтрация по ID_продажи
-
-                    OleDbDataAdapter adapter = new OleDbDataAdapter(query, connection);
-                    adapter.SelectCommand.Parameters.AddWithValue("@ID_продажи", saleId); // Добавляем параметр для фильтрации
-                    DataTable dataTable = new DataTable();
-                    adapter.Fill(dataTable);
-                    selectedProductsDataGrid.ItemsSource = dataTable.DefaultView;
-
-                    isEditMode = true;
-                    currentSaleId = saleId;
-                }
-            }
-        }
         
         private decimal CalculateTotalPrice()
         {
@@ -394,7 +414,7 @@ namespace CompuSale
         private void UpdateTotalPrice()
         {
             decimal totalPrice = CalculateTotalPrice();
-            totalPriceTextBox.Text = $"{totalPrice.ToString()} BYN";
+            totalPriceTextBox.Text = $"Итого: {totalPrice.ToString()} BYN";
             
             // Проверяем, установлен ли текущий ID продажи
             if (currentSaleId <= 0)
@@ -462,6 +482,20 @@ namespace CompuSale
         
         private void SaveBtn_Click(object sender, RoutedEventArgs e)
         {
+            DateTime selectedDate = saleDatePicker.SelectedDate ?? DateTime.Now;
+            
+            DeliveryMethod selectedDeliveryMethod = (DeliveryMethod)DeliveryComboBox.SelectedItem;
+            
+            if (selectedDeliveryMethod == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите способ доставки.");
+                return;
+            }
+
+            int deliveryMethodId = selectedDeliveryMethod.ID;
+            
+            string adress = AdressTextBox.Text;
+            
             // Получаем имя клиента из TextBox
             string clientName = clientTextBox.Text.Trim();
 
@@ -479,13 +513,13 @@ namespace CompuSale
                 OleDbCommand command = new OleDbCommand(query, connection);
 
                 // Устанавливаем параметры для SQL-запроса
-                command.Parameters.AddWithValue("@Дата_продажи", DateTime.Now.ToString("dd.MM.yyyy"));  // Текущая дата
+                command.Parameters.AddWithValue("@Дата_продажи", selectedDate);  // Текущая дата
                 command.Parameters.AddWithValue("@Статус", selectedStatus);
                 command.Parameters.AddWithValue("@Общая_стоимость", 0);          // Начальная общая стоимость
-                command.Parameters.AddWithValue("@адрес_доставки", "Минск, улица Примерная, 123"); // Примерный адрес доставки
+                command.Parameters.AddWithValue("@адрес_доставки", adress); // Примерный адрес доставки
                 command.Parameters.AddWithValue("@ID_сотрудника", EmployeeID);
                 command.Parameters.AddWithValue("@ID_клиента", currentClientId);               // Примерный ID клиента
-                command.Parameters.AddWithValue("@ID_способа_доставки", 1);      // Примерный способ доставки
+                command.Parameters.AddWithValue("@ID_способа_доставки", deliveryMethodId);      // Примерный способ доставки
 
                 try
                 {
@@ -500,6 +534,132 @@ namespace CompuSale
                 {
                     MessageBox.Show("Ошибка при создании новой продажи: " + ex.Message);
                 }
+            }
+        }
+
+        public void LoadSaleById(int saleId)
+        {
+            string query = "SELECT * FROM Элемент_продажи WHERE ID_продажи = @ID_продажи";
+
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                OleDbCommand command = new OleDbCommand(query, connection);
+                command.Parameters.AddWithValue("@ID_продажи", saleId);
+
+                connection.Open();
+                OleDbDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    // Запрос для получения товаров, связанных с конкретной продажей
+                    query = "SELECT Элемент_продажи.ID_товара, Товар.Название, Элемент_продажи.Количество " +
+                            "FROM Элемент_продажи " +
+                            "INNER JOIN Товар ON Элемент_продажи.ID_товара = Товар.ID_товара " +
+                            "WHERE Элемент_продажи.ID_продажи = @ID_продажи"; // Фильтрация по ID_продажи
+
+                    OleDbDataAdapter adapter = new OleDbDataAdapter(query, connection);
+                    adapter.SelectCommand.Parameters.AddWithValue("@ID_продажи", saleId); // Добавляем параметр для фильтрации
+                    DataTable dataTable = new DataTable();
+                    adapter.Fill(dataTable);
+                    selectedProductsDataGrid.ItemsSource = dataTable.DefaultView;
+
+                    isEditMode = true;
+                    currentSaleId = saleId;
+                }
+            }
+        }
+
+        public void EditSale(int saleId)
+        {
+            this.Width = 450;
+            this.Height = 300;
+            DeliveryComboBox.Visibility = Visibility.Collapsed;
+            clientTextBox.Visibility = Visibility.Collapsed;
+            clientWatermark.Visibility = Visibility.Collapsed;
+            CountTextBox.Visibility = Visibility.Collapsed;
+            CountWatermark.Visibility = Visibility.Collapsed;
+            employeeNameTextBox.Visibility = Visibility.Collapsed;
+            totalPriceTextBox.Visibility = Visibility.Collapsed;
+            searchTextBox.Visibility = Visibility.Collapsed;
+            searchWatermark.Visibility = Visibility.Collapsed;
+            searchBtn.Visibility = Visibility.Collapsed;
+            SaveCountBtn.Visibility = Visibility.Collapsed;
+            saleDatePicker.Visibility = Visibility.Collapsed;
+            saveBtn.Visibility = Visibility.Collapsed;
+            searchResultsListBox.Visibility = Visibility.Collapsed;
+            selectedProductsDataGrid.Margin = new Thickness(22, 0, 601, 318);
+            StatusComboBox.Margin = new Thickness(22, 210, 696, 278);
+
+            StatusComboBox.Items.Clear();
+            StatusComboBox.Items.Add("Новый");
+            StatusComboBox.Items.Add("В процессе");
+            StatusComboBox.Items.Add("Завершен");
+            StatusComboBox.Items.Add("Отменен");
+
+            // Установка текущего статуса продажи из базы данных
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                string saleQuery = "SELECT Статус FROM Продажа WHERE ID_продажи = @ID_продажи";
+                OleDbCommand saleCommand = new OleDbCommand(saleQuery, connection);
+                saleCommand.Parameters.AddWithValue("@ID_продажи", saleId);
+
+                connection.Open();
+                OleDbDataReader saleReader = saleCommand.ExecuteReader();
+                if (saleReader.Read())
+                {
+                    string currentStatus = saleReader["Статус"].ToString();
+                    StatusComboBox.SelectedItem = currentStatus;  // Устанавливаем текущий статус
+                }
+                saleReader.Close();
+            }
+
+            // Обработчик изменения статуса с сохранением в БД
+            StatusComboBox.SelectionChanged += (s, e) =>
+            {
+                SaveStatus(saleId);
+            };
+        }
+
+        private void SaveStatus(int saleId)
+        {
+            string selectedStatus = StatusComboBox.SelectedItem?.ToString();
+            if (string.IsNullOrEmpty(selectedStatus))
+            {
+                MessageBox.Show("Пожалуйста, выберите статус.");
+                return;
+            }
+
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                string updateQuery = "UPDATE Продажа SET Статус = @Статус WHERE ID_продажи = @ID_продажи";
+                OleDbCommand updateCommand = new OleDbCommand(updateQuery, connection);
+                updateCommand.Parameters.AddWithValue("@Статус", selectedStatus);
+                updateCommand.Parameters.AddWithValue("@ID_продажи", saleId);
+
+                connection.Open();
+                updateCommand.ExecuteNonQuery();
+
+                MessageBox.Show("Статус продажи обновлен.");
+            }
+        }
+
+        private void AdressTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            AdressWatermark.Visibility = string.IsNullOrEmpty(AdressWatermark.Text) ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        private void comboBoxDeliveryType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DeliveryComboBox.SelectedItem != null &&
+                DeliveryComboBox.SelectedItem.ToString() == "Доставка по адресу")
+            {
+                AdressTextBox.Visibility = Visibility.Visible;
+                AdressWatermark.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                AdressTextBox.Visibility = Visibility.Collapsed;
+                AdressWatermark.Visibility = Visibility.Collapsed;
             }
         }
     }

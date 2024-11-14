@@ -32,13 +32,40 @@ namespace CompuSale
             set 
             { 
                 Console.WriteLine("EmployeeID 1 step: " + value);
-                employeeID = value; 
+                employeeID = value;
             }
         }
+        
+        public string userRole;
+        public string UserRole {
+            get
+            {
+                return userRole;
+            }
+            set
+            {
+                Console.WriteLine("UserRole 1 step: " + value);
+                userRole = value;
+                ApplyRoleSettings();
+            } }
 
         public MainWindow()
         {
             InitializeComponent();
+        }
+        
+        private void ApplyRoleSettings()
+        {
+            if (userRole == "Администратор")
+            {
+                Console.WriteLine("Администратор авторизован");
+            }
+            else if (userRole == "Сотрудник")
+            {
+                Console.WriteLine("Сотрудник авторизован");
+                
+                employeesTreeViewItem.Visibility = Visibility.Collapsed;
+            }
         }
 
         private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
@@ -95,30 +122,97 @@ namespace CompuSale
                 if (selectedItem == productTreeViewItem)
                 {
                     LoadProducts();
+                    if (userRole == "Сотрудник")
+                    {
+                        EditButton.Visibility = Visibility.Collapsed;
+                        AddButton.Visibility = Visibility.Collapsed;
+                        DeleteButton.Visibility = Visibility.Collapsed;
+                    }
                 }
                 else if (selectedItem == categoryTreeViewItem)
                 {
                     LoadCategories();
+                    if (userRole == "Сотрудник")
+                    {
+                        EditButton.Visibility = Visibility.Collapsed;
+                        AddButton.Visibility = Visibility.Collapsed;
+                        DeleteButton.Visibility = Visibility.Collapsed;
+                    }
                 }
                 else if (selectedItem == manufacturerTreeViewItem)
                 {
                     LoadManufacturers();
+                    if (userRole == "Сотрудник")
+                    {
+                        EditButton.Visibility = Visibility.Collapsed;
+                        AddButton.Visibility = Visibility.Collapsed;
+                        DeleteButton.Visibility = Visibility.Collapsed;
+                    }
                 }
                 else if (selectedItem == clientsTreeViewItem)
                 {
                     LoadClients();
+                    if (userRole == "Сотрудник")
+                    {
+                        EditButton.Visibility = Visibility.Visible;
+                        AddButton.Visibility = Visibility.Visible;
+                        DeleteButton.Visibility = Visibility.Visible;
+                    }
+                    else if (userRole == "Администратор")
+                    {
+                        EditButton.Visibility = Visibility.Collapsed;
+                        AddButton.Visibility = Visibility.Collapsed;
+                        DeleteButton.Visibility = Visibility.Collapsed;
+                    }
                 }
                 else if (selectedItem == clientTypeTreeViewItem)
                 {
                     LoadClientTypes();
+                    LoadDeliveryTypes();
+                    if (userRole == "Сотрудник")
+                    {
+                        EditButton.Visibility = Visibility.Collapsed;
+                        AddButton.Visibility = Visibility.Collapsed;
+                        DeleteButton.Visibility = Visibility.Collapsed;
+                    }
+                    else if (userRole == "Администратор")
+                    {
+                        EditButton.Visibility = Visibility.Visible;
+                        AddButton.Visibility = Visibility.Visible;
+                        DeleteButton.Visibility = Visibility.Visible;
+                    }
                 }
                 else if (selectedItem == saleTreeViewItem)
                 {
                     LoadSales();
+                    if (userRole == "Сотрудник")
+                    {
+                        EditButton.Visibility = Visibility.Visible;
+                        AddButton.Visibility = Visibility.Visible;
+                        DeleteButton.Visibility = Visibility.Visible;
+                    }
+                    else if (userRole == "Администратор")
+                    {
+                        EditButton.Visibility = Visibility.Collapsed;
+                        AddButton.Visibility = Visibility.Collapsed;
+                        DeleteButton.Visibility = Visibility.Collapsed;
+                    }
                 }
                 else if (selectedItem == deliveryTypeTreeViewItem)
                 {
                     LoadDeliveryTypes();
+                    if (userRole == "Сотрудник")
+                    {
+                        EditButton.Visibility = Visibility.Collapsed;
+                        AddButton.Visibility = Visibility.Collapsed;
+                        DeleteButton.Visibility = Visibility.Collapsed;
+                    }
+                    else if (userRole == "Администратор")
+                    {
+                        EditButton.Visibility = Visibility.Visible;
+                        AddButton.Visibility = Visibility.Visible;
+                        DeleteButton.Visibility = Visibility.Visible;
+                    }
                 }
                 else if (selectedItem == employeesTreeViewItem)
                 {

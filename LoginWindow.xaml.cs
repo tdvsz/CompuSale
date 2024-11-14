@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Data.OleDb;
+using System.Data;
 
 namespace CompuSale
 {
@@ -18,9 +19,9 @@ namespace CompuSale
         private string _password = "";
         private string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=../../DataBase/information_system.accdb;";
 
-        private int? AuthenticateUser(string username, string password)
+        private string AuthenticateUser(string username, string password)
         {
-            int? employeeId = null;
+            string role = null;
 
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
@@ -28,7 +29,7 @@ namespace CompuSale
                 {
                     connection.Open();
 
-                    string query = "SELECT ID_сотрудника, ФИО FROM Сотрудник WHERE Логин = @username AND Пароль = @password";
+                    string query = "SELECT ID_сотрудника, ФИО, Роль FROM Сотрудник WHERE Логин = @username AND Пароль = @password";
 
                     using (OleDbCommand command = new OleDbCommand(query, connection))
                     {
@@ -39,8 +40,10 @@ namespace CompuSale
                         {
                             if (reader.Read())
                             {
-                                employeeId = reader.GetInt32(0);  // Получаем ID сотрудника
+                                CurrentEmployeeID = reader.GetInt32(0);  // Получаем ID сотрудника
                                 CurrentEmployeeName = reader.GetString(1);  // Сохраняем ФИО
+                                role = reader.GetString(2);  // Получаем роль сотрудника
+                                Console.WriteLine(role);
                             }
                         }
                     }
@@ -51,7 +54,7 @@ namespace CompuSale
                 }
             }
 
-            return employeeId;
+            return role;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -59,15 +62,15 @@ namespace CompuSale
             string username = loginTextBox.Text;
             string password = _password;
 
-            int? employeeId = AuthenticateUser(username, password);
+            string role = AuthenticateUser(username, password);
 
-            if (employeeId.HasValue)
+            if (role != null)
             {
-                CurrentEmployeeID = employeeId.Value;  // Сохраняем ID авторизованного сотрудника
-
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.EmployeeName = CurrentEmployeeName;  // Передаем ФИО на главную форму
                 mainWindow.EmployeeID = CurrentEmployeeID;
+                mainWindow.UserRole = role;  // Передаем роль пользователя
+                Console.WriteLine(role);
                 mainWindow.Show();
 
                 this.Close();
@@ -77,6 +80,7 @@ namespace CompuSale
                 MessageBox.Show("Неверный логин или пароль.");
             }
         }
+
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {

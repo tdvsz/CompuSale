@@ -29,25 +29,18 @@ namespace CompuSale
         public int EmployeeID
         {
             get {return employeeID;}
-            set 
-            { 
-                Console.WriteLine("EmployeeID 1 step: " + value);
-                employeeID = value;
-            }
+            set { employeeID = value; }
         }
         
         public string userRole;
         public string UserRole {
-            get
-            {
-                return userRole;
-            }
+            get { return userRole; }
             set
             {
-                Console.WriteLine("UserRole 1 step: " + value);
                 userRole = value;
                 ApplyRoleSettings();
-            } }
+            } 
+        }
 
         public MainWindow()
         {
@@ -80,40 +73,45 @@ namespace CompuSale
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             TreeViewItem selectedItem = listTreeView.SelectedItem as TreeViewItem;
-            if (selectedItem == productTreeViewItem)
+            if (selectedItem != null)
             {
-                ProductWindow newWindow = new ProductWindow();
-                newWindow.Show();
-            }
-            if (selectedItem == clientsTreeViewItem)
-            {
-                ClientWindow newWindow = new ClientWindow();
-                newWindow.Show();
-            }
-            if (selectedItem == saleTreeViewItem)
-            {
-                SaleWindow newWindow = new SaleWindow();
-                Console.WriteLine("Employee 2 step: " + EmployeeID);
-                newWindow.EmployeeID = EmployeeID;
-                newWindow.EmployeeName = EmployeeName;
-                Console.WriteLine("Employee ID 3 step: " + EmployeeID);
-                newWindow.Show();
-            }
-            if (selectedItem == manufacturerTreeViewItem)
-            {
-                ListsWindow newWindow = new ListsWindow
+                if (selectedItem == productTreeViewItem)
                 {
-                    SelectedTreeViewItem = "Производитель"  // Устанавливаем значение для проверки
-                };
-                newWindow.Show();
-            }
-            if (selectedItem == categoryTreeViewItem)
-            {
-                ListsWindow newWindow = new ListsWindow
+                    ProductWindow newWindow = new ProductWindow();
+                    newWindow.Show();
+                }
+                if (selectedItem == clientsTreeViewItem)
                 {
-                    SelectedTreeViewItem = "Категория"  // Устанавливаем значение для проверки
-                };
-                newWindow.Show();
+                    ClientWindow newWindow = new ClientWindow();
+                    newWindow.Show();
+                }
+                if (selectedItem == saleTreeViewItem)
+                {
+                    SaleWindow newWindow = new SaleWindow();
+                    newWindow.EmployeeID = EmployeeID;
+                    newWindow.EmployeeName = EmployeeName;
+                    newWindow.Show();
+                }
+                if (selectedItem == manufacturerTreeViewItem)
+                {
+                    ListsWindow newWindow = new ListsWindow
+                    {
+                        SelectedTreeViewItem = "Производитель"  // Устанавливаем значение для проверки
+                    };
+                    newWindow.Show();
+                }
+                if (selectedItem == categoryTreeViewItem)
+                {
+                    ListsWindow newWindow = new ListsWindow
+                    {
+                        SelectedTreeViewItem = "Категория"  // Устанавливаем значение для проверки
+                    };
+                    newWindow.Show();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите раздел для добавления записи");
             }
         }
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -129,6 +127,12 @@ namespace CompuSale
                         AddButton.Visibility = Visibility.Collapsed;
                         DeleteButton.Visibility = Visibility.Collapsed;
                     }
+                    else if (userRole == "Администратор")
+                    {
+                        EditButton.Visibility = Visibility.Visible;
+                        AddButton.Visibility = Visibility.Visible;
+                        DeleteButton.Visibility = Visibility.Visible;
+                    }
                 }
                 else if (selectedItem == categoryTreeViewItem)
                 {
@@ -139,6 +143,12 @@ namespace CompuSale
                         AddButton.Visibility = Visibility.Collapsed;
                         DeleteButton.Visibility = Visibility.Collapsed;
                     }
+                    else if (userRole == "Администратор")
+                    {
+                        EditButton.Visibility = Visibility.Visible;
+                        AddButton.Visibility = Visibility.Visible;
+                        DeleteButton.Visibility = Visibility.Visible;
+                    }
                 }
                 else if (selectedItem == manufacturerTreeViewItem)
                 {
@@ -148,6 +158,12 @@ namespace CompuSale
                         EditButton.Visibility = Visibility.Collapsed;
                         AddButton.Visibility = Visibility.Collapsed;
                         DeleteButton.Visibility = Visibility.Collapsed;
+                    }
+                    else if (userRole == "Администратор")
+                    {
+                        EditButton.Visibility = Visibility.Visible;
+                        AddButton.Visibility = Visibility.Visible;
+                        DeleteButton.Visibility = Visibility.Visible;
                     }
                 }
                 else if (selectedItem == clientsTreeViewItem)
@@ -169,7 +185,6 @@ namespace CompuSale
                 else if (selectedItem == clientTypeTreeViewItem)
                 {
                     LoadClientTypes();
-                    LoadDeliveryTypes();
                     if (userRole == "Сотрудник")
                     {
                         EditButton.Visibility = Visibility.Collapsed;
@@ -218,6 +233,18 @@ namespace CompuSale
                 else if (selectedItem == employeesTreeViewItem)
                 {
                     LoadEmployees();
+                    if (userRole == "Сотрудник")
+                    {
+                        EditButton.Visibility = Visibility.Collapsed;
+                        AddButton.Visibility = Visibility.Collapsed;
+                        DeleteButton.Visibility = Visibility.Collapsed;
+                    }
+                    else if (userRole == "Администратор")
+                    {
+                        EditButton.Visibility = Visibility.Visible;
+                        AddButton.Visibility = Visibility.Visible;
+                        DeleteButton.Visibility = Visibility.Visible;
+                    }
                 }
                 // string header = selectedItem.Header.ToString();
                 // switch (header)
@@ -253,19 +280,76 @@ namespace CompuSale
                 {
                     selectedCategoryId = Convert.ToInt32(row["ID_категории"]);
                 }
-                
+
+                if (row.Row.Table.Columns.Contains("ID_клиента"))
+                {
+                    selectedCategoryId = Convert.ToInt32(row["ID_клиента"]);
+                }
+
                 if (row.Row.Table.Columns.Contains("ID_продажи"))
                 {
                     selectedSaleId = Convert.ToInt32(row["ID_продажи"]);
                 }
-                
-                if (row.Row.Table.Columns.Contains("ID_клиента"))
+
+                if (row.Row.Table.Columns.Contains("ID_сотрудника"))
                 {
-                    selectedClientId = Convert.ToInt32(row["ID_клиента"]);
+                    selectedSaleId = Convert.ToInt32(row["ID_сотрудника"]);
                 }
             }
         }
-        
+
+        private void RenameColumns()
+        {
+            foreach (var column in EmployeeDataGrid.Columns)
+            {
+                switch (column.Header.ToString())
+                {
+                    case "ID_категории":
+                        column.Header = "№ категории";
+                        break;
+                    case "ID_производителя":
+                        column.Header = "№ производителя";
+                        break;
+                    case "ID_клиента":
+                        column.Header = "№ клиента";
+                        break;
+                    case "ID_типа_клиента":
+                        column.Header = "№ типа клиента";
+                        break;
+                    case "ID_продажи":
+                        column.Header = "№ продажи";
+                        break;
+                    case "ID_сотрудника":
+                        column.Header = "№ сотрудника";
+                        break;
+                    case "ID_способа_доставки":
+                        column.Header = "№ способа доставки";
+                        break;
+                    case "Номер_телефона":
+                        column.Header = "Телефон";
+                        break;
+                    case "Дата_продажи":
+                        column.Header = "Дата";
+                        break;
+                    case "Общая_стоимость":
+                        column.Header = "Общая стоимость";
+                        break;
+                    case "Адрес_доставки":
+                        column.Header = "Адрес доставки";
+                        break;
+                    case "Количество_на_складе":
+                        column.Header = "Количество на складе";
+                        break;
+                    case "Тип_клиента":
+                        column.Header = "Тип клиента";
+                        break;
+                    case "Способ_доставки":
+                        column.Header = "Способ доставки";
+                        break;
+                }
+            }
+        }
+
         private void LoadProducts()
         {
             using (OleDbConnection connection = new OleDbConnection(connectionString))
@@ -274,7 +358,7 @@ namespace CompuSale
                 {
                     connection.Open();
                     string query =
-                        "SELECT \nТовар.ID_товара,    Товар.Название,\nПроизводитель.Название AS Название_производителя,\n    Категория.Название AS Название_категории,    Товар.Цена,\n    Товар.Количество_на_складе,\n    Товар.Описание FROM \n    (Товар\n    INNER JOIN Производитель ON Товар.ID_производителя = Производитель.ID_производителя)\n    INNER JOIN Категория ON Товар.ID_категории = Категория.ID_категории;\n";
+                        "SELECT \nТовар.ID_товара,    Товар.Название,\nПроизводитель.Название AS Производитель,\n    Категория.Название AS Категория,    Товар.Цена,\n    Товар.Количество_на_складе,\n    Товар.Описание FROM \n    (Товар\n    INNER JOIN Производитель ON Товар.ID_производителя = Производитель.ID_производителя)\n    INNER JOIN Категория ON Товар.ID_категории = Категория.ID_категории;\n";
                     OleDbDataAdapter adapter = new OleDbDataAdapter(query, connection);
                     DataTable dataTable = new DataTable();
                     adapter.Fill(dataTable);
@@ -286,6 +370,7 @@ namespace CompuSale
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
             }
+            RenameColumns();
         }
         private void LoadManufacturers()
         {
@@ -306,6 +391,7 @@ namespace CompuSale
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
             }
+            RenameColumns();
         }
         private void LoadClients()
         {
@@ -327,6 +413,7 @@ namespace CompuSale
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
             }
+            RenameColumns();
         }
         private void LoadCategories()
         {
@@ -347,6 +434,7 @@ namespace CompuSale
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
             }
+            RenameColumns();
         }
         private void LoadClientTypes()
         {
@@ -366,6 +454,7 @@ namespace CompuSale
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
             }
+            RenameColumns();
         }
         private void LoadSales()
         {
@@ -386,6 +475,7 @@ namespace CompuSale
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
             }
+            RenameColumns();
         }
         private void LoadDeliveryTypes()
         {
@@ -405,6 +495,7 @@ namespace CompuSale
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
             }
+            RenameColumns();
         }
         private void LoadEmployees()
         {
@@ -424,77 +515,85 @@ namespace CompuSale
                     MessageBox.Show("Ошибка подключения к базе данных: " + ex.Message);
                 }
             }
+            RenameColumns();
         }
         
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             TreeViewItem selectedItem = listTreeView.SelectedItem as TreeViewItem;
-            if (selectedItem == productTreeViewItem)
+            if (selectedItem != null)
             {
-                if (selectedProductId == -1)
+                if (selectedItem == productTreeViewItem)
                 {
-                    MessageBox.Show("Выберите товар для редактирования.");
-                    return;
-                }
+                    if (selectedProductId == -1)
+                    {
+                        MessageBox.Show("Выберите товар для редактирования");
+                        return;
+                    }
 
-                ProductWindow productWindow = new ProductWindow();
-                productWindow.LoadProductDataById(selectedProductId);
-                productWindow.ShowDialog();
-            }
-            if (selectedItem == clientsTreeViewItem)
-            {
-                if (selectedClientId == -1)
-                {
-                    MessageBox.Show("Выберите клиента для редактирования.");
-                    return;
+                    ProductWindow productWindow = new ProductWindow();
+                    productWindow.LoadProductDataById(selectedProductId);
+                    productWindow.ShowDialog();
                 }
+                if (selectedItem == clientsTreeViewItem)
+                {
+                    if (selectedClientId == -1)
+                    {
+                        MessageBox.Show("Выберите клиента для редактирования");
+                        return;
+                    }
 
-                ClientWindow clientWindow = new ClientWindow();
-                clientWindow.LoadClientDataById(selectedClientId);
-                clientWindow.ShowDialog();
-            }
-            if (selectedItem == saleTreeViewItem)
-            {
-                if (selectedSaleId == -1)
-                {
-                    MessageBox.Show("Выберите продажу для редактирования.");
-                    return;
+                    ClientWindow clientWindow = new ClientWindow();
+                    clientWindow.LoadClientDataById(selectedClientId);
+                    clientWindow.ShowDialog();
                 }
-                
-                SaleWindow saleWindow = new SaleWindow();
-                saleWindow.LoadSaleById(selectedSaleId);
-                saleWindow.EditSale(selectedSaleId);
-                saleWindow.ShowDialog();
-            }
-            if (selectedItem == manufacturerTreeViewItem)
-            {
-                if (selectedManufacturerId == -1)
+                if (selectedItem == saleTreeViewItem)
                 {
-                    MessageBox.Show("Выберите товар для редактирования.");
-                    return;
-                }
+                    if (selectedSaleId == -1)
+                    {
+                        MessageBox.Show("Выберите продажу для редактирования");
+                        return;
+                    }
 
-                ListsWindow listsWindow = new ListsWindow
-                {
-                    SelectedTreeViewItem = "Производитель"  // Устанавливаем значение для проверки
-                };
-                listsWindow.LoadManufacturerDataById(selectedManufacturerId);
-                listsWindow.ShowDialog();
-            }
-            if (selectedItem == categoryTreeViewItem)
-            {
-                if (selectedCategoryId == -1)
-                {
-                    MessageBox.Show("Выберите товар для редактирования.");
-                    return;
+                    SaleWindow saleWindow = new SaleWindow();
+                    saleWindow.LoadSaleById(selectedSaleId);
+                    saleWindow.EditSale(selectedSaleId);
+                    saleWindow.ShowDialog();
                 }
-
-                ListsWindow listsWindow = new ListsWindow
+                if (selectedItem == manufacturerTreeViewItem)
                 {
-                    SelectedTreeViewItem = "Категория"  // Устанавливаем значение для проверки
-                };
-                listsWindow.LoadCategoryDataById(selectedCategoryId);
-                listsWindow.ShowDialog();
+                    if (selectedManufacturerId == -1)
+                    {
+                        MessageBox.Show("Выберите производителя для редактирования");
+                        return;
+                    }
+
+                    ListsWindow listsWindow = new ListsWindow
+                    {
+                        SelectedTreeViewItem = "Производитель"  // Устанавливаем значение для проверки
+                    };
+                    listsWindow.LoadManufacturerDataById(selectedManufacturerId);
+                    listsWindow.ShowDialog();
+                }
+                if (selectedItem == categoryTreeViewItem)
+                {
+                    if (selectedCategoryId == -1)
+                    {
+                        MessageBox.Show("Выберите категорию для редактирования");
+                        return;
+                    }
+
+                    ListsWindow listsWindow = new ListsWindow
+                    {
+                        SelectedTreeViewItem = "Категория"  // Устанавливаем значение для проверки
+                    };
+                    listsWindow.LoadCategoryDataById(selectedCategoryId);
+                    listsWindow.ShowDialog();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите запись для редактирования");
             }
         }
         
@@ -524,18 +623,23 @@ namespace CompuSale
                     id = Convert.ToInt32(row["ID_продажи"]);
                     DeleteRecordById("Продажа", "ID_продажи", id);
                 }
+                else if (row.Row.Table.Columns.Contains("ID_сотрудника"))
+                {
+                    id = Convert.ToInt32(row["ID_сотрудника"]);
+                    DeleteRecordById("Сотрудник", "ID_продажи", id);
+                }
                 if (id != -1)
                 {
                     row.Delete();
                 }
                 else
                 {
-                    MessageBox.Show("Ошибка: не удается найти идентификатор для удаления.");
+                    MessageBox.Show("Ошибка: не удается найти идентификатор для удаления");
                 }
             }
             else
             {
-                MessageBox.Show("Выберите строку для удаления.");
+                MessageBox.Show("Выберите запись для удаления");
             }
         }
         
@@ -555,11 +659,11 @@ namespace CompuSale
 
                     if (rowsAffected > 0)
                     {
-                        MessageBox.Show("Запись успешно удалена.");
+                        MessageBox.Show("Запись успешно удалена");
                     }
                     else
                     {
-                        MessageBox.Show("Не удалось найти запись для удаления.");
+                        MessageBox.Show("Не удалось найти запись для удаления");
                     }
                 }
                 catch (Exception ex)
@@ -569,11 +673,78 @@ namespace CompuSale
             }
         }
 
+        private void SearchInDataGrid(string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                ShowAllRows();
+                return;
+            }
+
+            bool found = false;
+
+            foreach (var item in EmployeeDataGrid.Items)
+            {
+                var row = item as DataRowView;
+                if (row != null)
+                {
+                    bool matchFound = false;
+
+                    foreach (var column in row.Row.ItemArray)
+                    {
+                        if (column.ToString().IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            matchFound = true;
+                            break;
+                        }
+                    }
+
+                    DataGridRow dataGridRow = EmployeeDataGrid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
+                    if (dataGridRow != null)
+                    {
+                        if (matchFound)
+                        {
+                            dataGridRow.Visibility = Visibility.Visible;
+                            found = true;
+                        }
+                        else
+                        {
+                            dataGridRow.Visibility = Visibility.Collapsed;
+                        }
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                ShowAllRows();
+            }
+        }
+
+        private void ShowAllRows()
+        {
+            foreach (var item in EmployeeDataGrid.Items)
+            {
+                DataGridRow dataGridRow = EmployeeDataGrid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
+                if (dataGridRow != null)
+                {
+                    dataGridRow.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
             LoginWindow loginwindow = new LoginWindow();
             loginwindow.Show();
             this.Close();
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            searchWatermark.Visibility = string.IsNullOrEmpty(searchTextBox.Text) ? Visibility.Visible : Visibility.Hidden;
+            string searchText = searchTextBox.Text;
+            SearchInDataGrid(searchText);
         }
     }
 }

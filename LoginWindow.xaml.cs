@@ -81,7 +81,6 @@ namespace CompuSale
             }
         }
 
-
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             int caretPosition = passwordTextBox.CaretIndex;

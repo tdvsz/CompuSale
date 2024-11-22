@@ -85,65 +85,72 @@ namespace CompuSale
             string name = nameTextBox.Text.Trim();
             string query;
 
-            if (SelectedTreeViewItem == "Производитель")
-            {
-                if (isEditMode)
+            if (nameTextBox.Text != String.Empty) {
+                if (SelectedTreeViewItem == "Производитель")
                 {
-                    query = "UPDATE Производитель SET Название = @Название WHERE ID_производителя = @ID_производителя";
+                    if (isEditMode)
+                    {
+                        query = "UPDATE Производитель SET Название = @Название WHERE ID_производителя = @ID_производителя";
+                    }
+                    else
+                    {
+                        query = "INSERT INTO Производитель (Название) VALUES (@Название)";
+                    }
+                }
+                else if (SelectedTreeViewItem == "Категория")
+                {
+                    if (isEditMode)
+                    {
+                        query = "UPDATE Категория SET Название = @Название WHERE ID_категории = @ID_категории";
+                    }
+                    else
+                    {
+                        query = "INSERT INTO Категория (Название) VALUES (@Название)";
+                    }
                 }
                 else
                 {
-                    query = "INSERT INTO Производитель (Название) VALUES (@Название)";
+                    MessageBox.Show("Не выбран элемент для сохранения");
+                    return;
                 }
-            }
-            else if (SelectedTreeViewItem == "Категория")
-            {
-                if (isEditMode)
+
+                using (OleDbConnection connection = new OleDbConnection(connectionString))
                 {
-                    query = "UPDATE Категория SET Название = @Название WHERE ID_категории = @ID_категории";
+                    OleDbCommand command = new OleDbCommand(query, connection);
+
+                    command.Parameters.Add("@Название", OleDbType.VarChar).Value = name;
+
+                    if (isEditMode)
+                    {
+                        // Добавляем параметр ID только если это режим редактирования
+                        if (SelectedTreeViewItem == "Производитель")
+                        {
+                            command.Parameters.Add("@ID_производителя", OleDbType.Integer).Value = selectedManufacturerId;
+                        }
+                        else if (SelectedTreeViewItem == "Категория")
+                        {
+                            command.Parameters.Add("@ID_категории", OleDbType.Integer).Value = selectedCategorytId;
+                        }
+                    }
+
+                    try
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        MessageBox.Show(isEditMode ? "Данные обновлены." : "Данные сохранены в базу данных");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Ошибка при сохранении данных: " + ex.Message);
+                    }
                 }
-                else
-                {
-                    query = "INSERT INTO Категория (Название) VALUES (@Название)";
-                }
+                this.Close();
             }
             else
             {
-                MessageBox.Show("Не выбран элемент для сохранения.");
+                MessageBox.Show("Заполните поле");
                 return;
             }
-
-            using (OleDbConnection connection = new OleDbConnection(connectionString))
-            {
-                OleDbCommand command = new OleDbCommand(query, connection);
-
-                command.Parameters.Add("@Название", OleDbType.VarChar).Value = name;
-
-                if (isEditMode)
-                {
-                    // Добавляем параметр ID только если это режим редактирования
-                    if (SelectedTreeViewItem == "Производитель")
-                    {
-                        command.Parameters.Add("@ID_производителя", OleDbType.Integer).Value = selectedManufacturerId;
-                    }
-                    else if (SelectedTreeViewItem == "Категория")
-                    {
-                        command.Parameters.Add("@ID_категории", OleDbType.Integer).Value = selectedCategorytId;
-                    }
-                }
-
-                try
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    MessageBox.Show(isEditMode ? "Данные обновлены." : "Данные сохранены в базу данных.");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Ошибка при сохранении данных: " + ex.Message);
-                }
-            }
-            this.Close();
         }
 
         private void cancelBtn_Click(object sender, RoutedEventArgs e)

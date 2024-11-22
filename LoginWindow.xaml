@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:CompuSale"
         mc:Ignorable="d"
+        Icon="/cart.ico"
         Title="Аутентификация" ResizeMode="NoResize" Background="#F6F6F6" Width="400" Height="370">
 
     <Window.Resources>

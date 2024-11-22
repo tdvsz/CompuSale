@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CompuSale"
         mc:Ignorable="d"
+                Icon="/cart.ico"
         Title="Продажа" Height="570" Width="888">
     <Window.Resources>
         <Style TargetType="TextBox" x:Key="RoundedTextBoxStyle">

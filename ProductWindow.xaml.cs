@@ -105,11 +105,11 @@ namespace CompuSale
                 LoadManufacturerSuggestions();
                 addManufacturerBtn.Visibility = Visibility.Collapsed;
 
-                MessageBox.Show("Производитель добавлен в базу данных.");
+                MessageBox.Show("Производитель добавлен в базу данных");
             }
             else
             {
-                MessageBox.Show("Введите название производителя.");
+                MessageBox.Show("Введите название производителя");
             }
         }
 
@@ -235,7 +235,7 @@ namespace CompuSale
 
             if (!int.TryParse(countTextBox.Text.Trim(), out count))
             {
-                MessageBox.Show("Введите корректное количество.");
+                MessageBox.Show("Введите корректное количество");
                 return;
             }
 
@@ -246,7 +246,7 @@ namespace CompuSale
             }
             catch (FormatException)
             {
-                MessageBox.Show("Введите корректную цену.");
+                MessageBox.Show("Введите корректную цену");
                 return;
             }
 
@@ -255,7 +255,7 @@ namespace CompuSale
 
             if (categoryId == -1 || manufacturerId == -1)
             {
-                MessageBox.Show("Категория или производитель не найдены.");
+                MessageBox.Show("Категория или производитель не найдены");
                 return;
             }
 
@@ -292,7 +292,7 @@ namespace CompuSale
                 {
                     connection.Open();
                     command.ExecuteNonQuery();
-                    MessageBox.Show(isEditMode ? "Данные о товаре обновлены." : "Данные о товаре сохранены в базу данных.");
+                    MessageBox.Show(isEditMode ? "Данные о товаре обновлены." : "Данные о товаре сохранены в базу данных");
                 }
                 catch (Exception ex)
                 {
@@ -363,11 +363,9 @@ namespace CompuSale
                     priceTextBox.Text = reader["Цена"].ToString();
                     countTextBox.Text = reader["Количество_на_складе"].ToString();
 
-                    // Используйте методы для получения названий производителя и категории по ID
                     textBox.Text = GetManufacturerNameById(Convert.ToInt32(reader["ID_производителя"]));
                     categoryTextBox.Text = GetCategoryNameById(Convert.ToInt32(reader["ID_категории"]));
 
-                    // Установите флаг редактирования
                     isEditMode = true;
                     currentProductId = productId;
                 }

@@ -54,7 +54,7 @@ namespace CompuSale
             LoadClientSuggestions();
             LoadDataIntoComboBox();
         }
-        
+
         private void LoadDataIntoComboBox()
         {
             string query = "SELECT ID_способа_доставки, Название FROM Способ_доставки";
@@ -419,7 +419,7 @@ namespace CompuSale
             // Проверяем, установлен ли текущий ID продажи
             if (currentSaleId <= 0)
             {
-                MessageBox.Show("Не удалось сохранить общую стоимость. Неверный ID продажи.");
+                MessageBox.Show("Не удалось сохранить общую стоимость. Неверный ID продажи");
                 return;
             }
 
@@ -471,40 +471,51 @@ namespace CompuSale
                 }
                 else
                 {
-                    MessageBox.Show("Введите корректное количество.");
+                    MessageBox.Show("Введите корректное количество");
                 }
             }
             else
             {
-                MessageBox.Show("Выберите товар для обновления.");
+                MessageBox.Show("Выберите товар для обновления");
             }
         }
-        
+
         private void SaveBtn_Click(object sender, RoutedEventArgs e)
         {
-            DateTime selectedDate = saleDatePicker.SelectedDate ?? DateTime.Now;
-            
+            DateTime? selectedDate = saleDatePicker.SelectedDate;
             DeliveryMethod selectedDeliveryMethod = (DeliveryMethod)DeliveryComboBox.SelectedItem;
-            
-            if (selectedDeliveryMethod == null)
+            ComboBoxItem selectedStatusItem = (ComboBoxItem)StatusComboBox.SelectedItem;
+            string selectedStatus = selectedStatusItem?.Content?.ToString();
+            string adress = AdressTextBox.Text.Trim();
+            string clientName = clientTextBox.Text.Trim();
+
+            if (!selectedDate.HasValue || selectedDeliveryMethod == null || string.IsNullOrEmpty(selectedStatus) || string.IsNullOrEmpty(clientName))
             {
-                MessageBox.Show("Пожалуйста, выберите способ доставки.");
+                MessageBox.Show("Заполните все данные для продажи");
                 return;
             }
 
-            int deliveryMethodId = selectedDeliveryMethod.ID;
-            
-            string adress = AdressTextBox.Text;
-            
-            // Получаем имя клиента из TextBox
-            string clientName = clientTextBox.Text.Trim();
+            //if ()
+            //{
+            //    MessageBox.Show("Выберите способ доставки.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    return;
+            //}
 
-            // Проверяем, существует ли клиент
+            //if ()
+            //{
+            //    MessageBox.Show("Выберите статус.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    return;
+            //}
+
+            //if ()
+            //{
+            //    MessageBox.Show("Введите имя клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    return;
+            //}
+
+            int deliveryMethodId = selectedDeliveryMethod.ID;
             currentClientId = GetClientId(clientName);
-            
-            string selectedStatus = (StatusComboBox.SelectedItem as ComboBoxItem).Content.ToString();
-            
-            // SQL-запрос для добавления новой продажи в базу данных
+
             string query = "INSERT INTO Продажа (Дата_продажи, Статус, Общая_стоимость, адрес_доставки, ID_сотрудника, ID_клиента, ID_способа_доставки) " +
                            "VALUES (@Дата_продажи, @Статус, @Общая_стоимость, @адрес_доставки, @ID_сотрудника, @ID_клиента, @ID_способа_доставки)";
 
@@ -512,14 +523,13 @@ namespace CompuSale
             {
                 OleDbCommand command = new OleDbCommand(query, connection);
 
-                // Устанавливаем параметры для SQL-запроса
-                command.Parameters.AddWithValue("@Дата_продажи", selectedDate);  // Текущая дата
+                command.Parameters.AddWithValue("@Дата_продажи", selectedDate.Value);
                 command.Parameters.AddWithValue("@Статус", selectedStatus);
-                command.Parameters.AddWithValue("@Общая_стоимость", 0);          // Начальная общая стоимость
-                command.Parameters.AddWithValue("@адрес_доставки", adress); // Примерный адрес доставки
+                command.Parameters.AddWithValue("@Общая_стоимость", 0);
+                command.Parameters.AddWithValue("@адрес_доставки", adress);
                 command.Parameters.AddWithValue("@ID_сотрудника", EmployeeID);
-                command.Parameters.AddWithValue("@ID_клиента", currentClientId);               // Примерный ID клиента
-                command.Parameters.AddWithValue("@ID_способа_доставки", deliveryMethodId);      // Примерный способ доставки
+                command.Parameters.AddWithValue("@ID_клиента", currentClientId);
+                command.Parameters.AddWithValue("@ID_способа_доставки", deliveryMethodId);
 
                 try
                 {
@@ -529,13 +539,15 @@ namespace CompuSale
                     // Получаем ID новой продажи
                     command.CommandText = "SELECT @@IDENTITY";
                     currentSaleId = (int)command.ExecuteScalar();
+                    MessageBox.Show("Продажа успешно сохранена");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при создании новой продажи: " + ex.Message);
+                    MessageBox.Show("Ошибка при создании новой продажи: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
+
 
         public void LoadSaleById(int saleId)
         {

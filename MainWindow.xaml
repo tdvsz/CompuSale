@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CompuSale"
         mc:Ignorable="d"
+                Icon="/cart.ico"
         Title="CompuSale" Height="900" Width="1600">
 
     <Window.Resources>
-        <!-- Стиль для TreeView, убирающий обводку -->
         <Style TargetType="TreeView">
             <Setter Property="Template">
                 <Setter.Value>
@@ -65,6 +65,27 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style TargetType="TextBox" x:Key="RoundedTextBoxStyle">
+            <Setter Property="Background" Value="#E6E6E6"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="FontFamily" Value="Calibri"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        CornerRadius="4" 
+                        Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid Width="1600" Height="900" Background="White">
@@ -116,7 +137,7 @@
                             </ToolTip>
                         </Button.ToolTip>
                     </Button>
-                    <Button x:Name="SaveButton" Margin="15, 0" Width="54" Height="54">
+                    <Button x:Name="SaveButton" Margin="15, 0" Width="54" Height="54" Visibility="Collapsed">
                         <Button.Content>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="38" Width="40">
                                 <Image Width="38" Height="38" Source="/save2.png"/>
@@ -164,6 +185,19 @@
                             </ToolTip>
                         </Button.ToolTip>
                     </Button>
+                    <Grid Height="36" Width="300">
+                        <StackPanel Margin="0,0,-18,0">
+                            <TextBox x:Name="searchTextBox" MaxLength="50" Width="300" Height="36" TextChanged="SearchTextBox_TextChanged" Style="{StaticResource RoundedTextBoxStyle}" FontSize="18"/>
+                        </StackPanel>
+                        <TextBlock x:Name="searchWatermark"
+                            Text="Поиск"
+                            Foreground="Gray"
+                            FontFamily="Calibri"
+                            FontSize="18"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="Visible" Margin="20,0,-2,0"/>
+                    </Grid>
                 </StackPanel>
                 <Button x:Name="LogoutButton" Click="LogoutButton_Click" Margin="-271,772,1477,0" Width="54" Height="54">
                     <Button.Content>
@@ -177,7 +211,31 @@
                         </ToolTip>
                     </Button.ToolTip>
                 </Button>
-                <DataGrid x:Name="EmployeeDataGrid" AutoGenerateColumns="True" Margin="24,93,32,27" SelectionChanged="EmployeeDataGrid_SelectionChanged"/>
+                <DataGrid x:Name="EmployeeDataGrid" 
+                    FontFamily="Calibri" 
+                    FontSize="16" 
+                    AutoGenerateColumns="True" 
+                    AlternationCount="2" 
+                    Margin="24,93,32,27" 
+                    SelectionChanged="EmployeeDataGrid_SelectionChanged">
+                    <DataGrid.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#199F41" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="white" />
+                    </DataGrid.Resources>
+
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="White" />
+
+                            <Style.Triggers>
+                                <Trigger Property="AlternationIndex" Value="1">
+                                    <Setter Property="Background" Value="#E6E6E6" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+                </DataGrid>
+
             </Grid>
         </Border>
     </Grid>
